@@ -13,8 +13,8 @@ CREATE TABLE players (
 
 CREATE TABLE matches (
   id  SERIAL PRIMARY KEY,
-  winner integer,
-  loser  integer
+  winner INTEGER REFERENCES players,
+  loser  INTEGER REFERENCES players
 );
 
 -- View for counting wins per player
