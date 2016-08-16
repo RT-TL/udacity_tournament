@@ -26,7 +26,9 @@ Besides the project-based vagrant file no further dependencies are required.
 ## Project Structure
 
 /tournament.py  Endpoints for database operations
+
 /tournament.sql Schema file to create database
+
 /tournament_test.py Unchanged test file
 
 ## License
