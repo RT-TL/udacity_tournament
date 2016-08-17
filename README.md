@@ -12,9 +12,31 @@ This project represents basic web usage aspects: Creation of accounts, simple ri
 
 ## Quick start
 
-Clone repository:
+1. Clone repository:
 ```
 git clone https://github.com/Roomtailors/udacity_tournament.git
+```
+
+2. Start Vagrant 
+```
+vagrant up
+```
+
+3. SSH into Vagrant
+```
+vagrant ssh
+```
+
+4. Navigate to root/vagrant/tournament
+5. Create database and tables
+```
+psql -f tournament.sql
+```
+
+6. Run unit tests
+
+```
+python tournament_test.py
 ```
 
 ## Requirements

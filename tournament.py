@@ -6,35 +6,38 @@
 import psycopg2
 
 # DATABASE contains all shared functions for database operations
-class Database:
+class Database(object):
+    """ Open and close database connection """
     con = object
     cur = object
 
-    # Initiate connection
-    def __init__(self):
+    def __enter__(self):
+        """ Create connection and cursor """
         self.con = psycopg2.connect("dbname=tournament")
         self.cur = self.con.cursor()
+        return self
 
-    # Terminate connection
     def __exit__(self, exc_type, exc_val, exc_tb):
+        """ Terminate connection """
         self.con.close()
 
-# Create Database instance
-db = Database()
-
 def deleteMatches():
-    # Remove all records
-    db.cur.execute("DELETE FROM matches")
+    """Remove all records """
+    with Database() as db:
+        db.cur.execute("DELETE FROM matches")
+        db.con.commit()
 
 def deletePlayers():
-    # Remove all players
-    db.cur.execute("DELETE FROM players")
+    """Remove all records """
+    with Database() as db:
+        db.cur.execute("DELETE FROM players")
+        db.con.commit()
 
 def countPlayers():
-
     # Select player count
-    db.cur.execute("SELECT count(*) FROM players")
-    result = db.cur.fetchone()
+    with Database() as db:
+        db.cur.execute("SELECT count(*) FROM players")
+        result = db.cur.fetchone()
 
     # Return empty result if no players found
     if not result:
@@ -46,7 +49,9 @@ def countPlayers():
 def registerPlayer(name):
 
     # Insert player name into the database, auto-assign serial
-    db.cur.execute("INSERT INTO players (name) VALUES (%s)", (name,))
+    with Database() as db:
+        db.cur.execute("INSERT INTO players (name) VALUES (%s)", (name,))
+        db.con.commit()
 
 def playerStandings():
 
@@ -64,8 +69,9 @@ def playerStandings():
     """
 
     # Run query using the views wincounts and totalmatches
-    db.cur.execute("SELECT wincounts.id, wincounts.name, wincounts.wins, totalmatches.total_matches FROM wincounts JOIN totalmatches ON wincounts.id = totalmatches.id ORDER BY wincounts.wins DESC")
-    result = db.cur.fetchall()
+    with Database() as db:
+        db.cur.execute("SELECT wincounts.id, wincounts.name, wincounts.wins, totalmatches.total_matches FROM wincounts JOIN totalmatches ON wincounts.id = totalmatches.id ORDER BY wincounts.wins DESC")
+        result = db.cur.fetchall()
 
     return result
 
@@ -77,8 +83,9 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
-    db.cur.execute("INSERT INTO matches (winner, loser) VALUES (%s, %s)", (winner, loser,))
-    db.con.commit()
+    with Database() as db:
+        db.cur.execute("INSERT INTO matches (winner, loser) VALUES (%s, %s)", (winner, loser,))
+        db.con.commit()
  
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
@@ -97,8 +104,9 @@ def swissPairings():
     """
 
     # Get players by rank
-    db.cur.execute("SELECT wincounts.id, wincounts.name FROM wincounts ORDER BY wincounts.wins DESC")
-    opponents = db.cur.fetchall()
+    with Database() as db:
+        db.cur.execute("SELECT wincounts.id, wincounts.name FROM wincounts ORDER BY wincounts.wins DESC")
+        opponents = db.cur.fetchall()
 
     # Prepare pairing variables
     index = 0
@@ -112,4 +120,3 @@ def swissPairings():
         index = index +2
 
     return pairings
-
