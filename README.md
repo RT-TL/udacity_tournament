@@ -24,7 +24,10 @@ This project represents basic web usage aspects: Creation of accounts, simple ri
   ```
   vagrant ssh
   ```
-4. Navigate to root/vagrant/tournament
+4. Navigate to 
+  ```
+  root/vagrant/tournament
+  ```
 5. Create database and tables
   ```
   psql -f tournament.sql
